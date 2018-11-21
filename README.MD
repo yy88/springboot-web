@@ -6,3 +6,4 @@
 4、使用了默认的logback日志框架<br>
 5、使用了多环境的yml配置，application-dev.yml,application-prod.yml，灵活部署<br>
 6、部署的时候，可以使用springboot默认支持的外部配置方式:config/application-prod.yml<br>
+7、使用了bootstrapValidator前端校验框架。

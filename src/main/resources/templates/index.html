@@ -4,27 +4,29 @@
     <meta charset="UTF-8">
     <title>客户关系管理系统</title>
     <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/bootstrapValidator.css">
     <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="../js/bootstrapValidator.js"></script>
 </head>
 <body>
 <h2 class="text-center">客户关系管理系统</h2>
 <div style="padding: 100px 100px 10px;">
-    <form class="bs-example bs-example-form" role="form" id="myForm">
-        <div class="input-group">
+    <form class="bs-example bs-example-form" role="form" id="myForm" action="/login">
+        <div class="input-group form-group">
             <span class="input-group-addon">客户姓名</span>
             <input name="custmerName" type="text" class="form-control">
         </div><br>
-        <div class="input-group">
+        <div class="input-group form-group">
             <span class="input-group-addon">交易事项</span>
             <input name="transName" type="text" class="form-control">
         </div><br>
 
-        <div class="input-group">
+        <div class="input-group form-group">
             <span class="input-group-addon">交易备注</span>
             <input name="remark" type="text" class="form-control">
         </div><br>
-        <button type="button"  class="btn btn-success" id="aa">提交记录</button>
+        <button type="submit"  class="btn btn-success" id="aa">提交记录</button>
     </form>
 </div>
 
@@ -51,20 +53,57 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <script type="text/javascript">
-    $("#aa").click(function () {
-        var datas=$("#myForm").serializeArray();
-        $.post("/login", datas,function(data){
-            var msg;
-            if (data) {
-                msg="成功"
-            }else {
-                msg="系统发生错误，请重试";
-            }
+    $(document).ready(function() {
+        $('#myForm')
+            .bootstrapValidator({
+                message: 'This value is not valid',
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    custmerName: {
+                        message: 'The customerName is not valid',
+                        validators: {
+                            notEmpty: {
+                                message: '客户姓名不能为空'
+                            }
+                        }
+                    },
+                    transName: {
+                        validators: {
+                            notEmpty: {
+                                message: '交易事项不能为空'
+                            }
+                        }
+                    }
+                }
+            })
+            .on('success.form.bv', function(e) {
+                // Prevent form submission
+                e.preventDefault();
 
-            $("#modal-body").html(msg);
-            $('#myModal').modal('show');//打开模态框
+                // Get the form instance
+                var $form = $(e.target);
+
+                // Get the BootstrapValidator instance
+                var bv = $form.data('bootstrapValidator');
+
+                // Use Ajax to submit form data
+                $.post($form.attr('action'), $form.serialize(), function(data) {
+                    var msg;
+                    if (data) {
+                        msg="成功"
+                    }else {
+                        msg="系统发生错误，请重试";
+                    }
+
+                    $("#modal-body").html(msg);
+                    $('#myModal').modal('show');//打开模态框
+
+                }, 'json');
             });
-
     });
 </script>
 </body>
